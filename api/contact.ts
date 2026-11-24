@@ -58,9 +58,13 @@ export async function handleContact(request: Request, dependencies: DependencyOp
       if(accepted.size>=2000 || pending.size>=100) return result({error:'Please try again in a few minutes.'},429);
       job=(async()=>{
         const response=await send(`https://formsubmit.co/ajax/${encodeURIComponent(env.CONTACT_TO_EMAIL!)}`,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json',Origin:origin,Referer:origin+'/'},body:JSON.stringify(payload),signal:AbortSignal.timeout(10000)});
-        if(!response.ok)return false;
-        const receipt=await response.json() as {success?:boolean | string};
-        if(receipt.success!==true && receipt.success!=='true')return false;
+        if(!response.ok){console.warn('[contact] Provider HTTP rejection',response.status);return false;}
+        if(!response.headers.get('content-type')?.includes('json')){console.warn('[contact] Provider returned a non-JSON response');return false;}
+        const receipt=await response.json() as {success?:boolean | string;message?:string};
+        if(receipt.success!==true && receipt.success!=='true'){
+          const category=/activat/i.test(receipt.message??'')?'activation-required':/spam|bot|captcha/i.test(receipt.message??'')?'anti-spam':'submission-rejected';
+          console.warn('[contact] Provider submission rejection',category);return false;
+        }
         accepted.set(eventKey,{fingerprint,expires:now()+24*60*60*1000});
         return true;
       })();
