@@ -5,19 +5,27 @@ import { settings } from '../data/messages';
 // One narration owner. Chapter changes always release the previous recording.
 export function useAudio(src: string | null, volume: number, muted: boolean) {
   const sound = useRef<Howl | null>(null);
+  const preferences = useRef({volume, muted});
+  preferences.current = {volume, muted};
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [status, setStatus] = useState<'missing' | 'loading' | 'ready' | 'error'>('missing');
+  const [status, setStatus] = useState<'missing' | 'loading' | 'ready' | 'blocked' | 'error'>('missing');
   useEffect(() => {
     setTime(0); setDuration(0); setPlaying(false);
     if (!src) { setStatus('missing'); return; }
     setStatus('loading');
-    const audio = new Howl({ src: [src], html5: true, preload: true,
-      onload: () => { setDuration(audio.duration()); setStatus('ready'); },
+    const audio = new Howl({ src: [src], html5: true, preload: true, volume: preferences.current.muted ? 0 : preferences.current.volume,
+      onload: () => {
+        audio.volume(preferences.current.muted ? 0 : preferences.current.volume);
+        setDuration(audio.duration()); setStatus('ready'); audio.play();
+      },
       onloaderror: () => setStatus('error'),
-      onplayerror: () => { setPlaying(false); setStatus('error'); },
-      onplay: () => setPlaying(true), onpause: () => setPlaying(false),
+      onplayerror: () => {
+        setPlaying(false); setStatus('blocked');
+        audio.once('unlock', () => {if (sound.current === audio) audio.play();});
+      },
+      onplay: () => {setPlaying(true); setStatus('ready');}, onpause: () => setPlaying(false),
       onend: () => { setPlaying(false); setTime(audio.duration()); },
     });
     sound.current = audio;
@@ -36,9 +44,9 @@ export function useAudio(src: string | null, volume: number, muted: boolean) {
     return () => cancelAnimationFrame(frame);
   }, [playing]);
   return {playing, time, duration, status,
-    toggle: () => { const a = sound.current; if (!a || status !== 'ready') return; if (a.playing()) a.pause(); else a.play(); },
+    toggle: () => { const a = sound.current; if (!a || (status !== 'ready' && status !== 'blocked')) return; if (a.playing()) a.pause(); else a.play(); },
     seek: (seconds: number) => { sound.current?.seek(seconds); setTime(seconds); },
-    replay: () => { if (status === 'ready') { sound.current?.seek(0); sound.current?.play(); setTime(0); } },
+    replay: () => { if (status === 'ready' || status === 'blocked') { sound.current?.seek(0); sound.current?.play(); setTime(0); } },
   };
 }
 

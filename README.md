@@ -15,7 +15,7 @@ npm run preview
 
 All five letters and recipient settings live in `src/data/messages.ts`. Current copy is explicitly sample content. Change `recipient`, `sender`, the five message bodies and signatures; set `isSample` to false only after replacing the samples. The memory chapter deliberately makes no claim about a real shared memory.
 
-Four supplied recordings are bundled for chapters 1, 2, 3 and 5; chapter 4 awaits its recording. No personal photos or licensed background music were supplied. See the narration section below for timing provenance and file mapping.
+All five letters now have supplied recordings, including my letter.mp3 for chapter 4. No personal photos or licensed background music were supplied. See the narration section below for timing provenance and file mapping.
 
 1. Put approved recordings in `public/audio/`, then set each message's `audio` to a root-relative path such as `/audio/message-01.mp3`.
 2. Supply verified sentence cues (`start`, `end`, `text`) in seconds for that recording. Do not estimate timestamps from text length. With cues, playback time highlights the spoken sentence; sentences can be clicked to seek. This is sentence synchronization, not word synchronization. Without cues the complete letter stays readable.
@@ -49,13 +49,15 @@ Open `/gift-card.html` for Kimberly Ann's matching A6 gift-card studio. After pu
 
 ## Supplied narration and word highlighting
 
-Recordings are now bundled for chapters 1 (`vm1.mp3`), 2 (`vm2.mp3`), 3 (`vm4new.mp3`, matched by its actual spoken content), and 5 (`vm5.mp3`). Chapter 4 remains text-only until its matching recording is supplied. No recordings are generated or reused over unrelated text.
+Recordings are bundled for chapters 1 (`vm1.mp3`), 2 (`vm2.mp3`), 3 (`vm4new.mp3`, matched by its actual spoken content), 4 (`vm4.mp3`, supplied as `my letter.mp3`), and 5 (`vm5.mp3`). No recordings are generated or reused over unrelated text.
 
-`src/data/narration-words.json` contains word timestamps from local faster-whisper base.en transcription, aligned to the existing display text. Gold highlighting follows Howler's playback clock, including after seek, pause, resume and replay. These are automatic acoustic timings, not manually certified boundaries; a zero-duration ASR word is omitted rather than inventing its timing. Unspoken headings and signatures remain visible without an artificial highlight. Read and listen together in either mode; cinematic mode also brings the active text into view. Reduced motion preserves highlighting without animated transitions. Starting narration explicitly enables sound; the global mute and volume controls still apply.
+`src/data/narration-words.json` contains word timestamps from local faster-whisper base.en transcription, aligned to the existing display text. Gold highlighting follows Howler's playback clock, including after seek, pause, resume and replay. These are automatic acoustic timings, not manually certified boundaries; a zero-duration ASR word is omitted rather than inventing its timing. Unspoken headings and signatures remain visible without an artificial highlight. Read and listen together in either mode; cinematic mode also brings the active text into view. Reduced motion preserves highlighting without animated transitions. Narration starts automatically when a recorded letter opens, preserving global mute and volume. The envelope opening is the initial interaction; a browser that still blocks audio shows a one-tap play fallback. Pausing holds playback until the reader resumes it or opens another letter.
 
 To change recorded wording, replace the audio and regenerate its timing data together. Never stretch these cues to fit a new recording or estimate word positions from character counts. Temporary transcription libraries, models, and intermediate files stay in ignored `tmp/` and are not shipped or required by the static website.
 
 
 ## Gentle interaction sounds
 
-`src/audio/soundEffects.ts` creates original, quiet procedural paper rustles for seal release, flap opening, letter extraction, unfolding and page turns, plus a soft three-note closing chime. Sound is enabled initially but nothing plays until a user interaction. The global volume/mute and independent sound-effects checkbox control these effects; narration uses its own playback path. Rapid interactions stop previous effects rather than stacking them. The audio nodes release themselves when finished, and active effects stop when muted, disabled or the experience unmounts. Letter four's content and missing narration are unchanged.
+`src/audio/soundEffects.ts` creates original, quiet procedural paper rustles for seal release, flap opening, letter extraction, unfolding and page turns, plus a soft three-note closing chime. Sound is enabled initially but nothing plays until a user interaction. The global volume/mute and independent sound-effects checkbox control these effects; narration uses its own playback path. Rapid interactions stop previous effects rather than stacking them. The audio nodes release themselves when finished, and active effects stop when muted, disabled or the experience unmounts. Letter content is unchanged; all five chapters now have recordings.
+
+
