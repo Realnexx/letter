@@ -23,7 +23,8 @@ export default function App() {
   const [music, setMusic] = useState(true);
   const [reading, setReading] = useState(true);
   const reduced = useReducedMotion();
-  const contactEnabled = useContact();
+  const contact = useContact();
+  const contactEnabled = contact.enabled;
   const ambience = useBackgroundMusic(music, stage === 'letters', volume, muted);
   useEffect(() => {setEffectVolume(muted || !effects ? 0 : volume);}, [muted, effects, volume]);
   useEffect(() => () => stopEffects(), []);
@@ -62,7 +63,7 @@ export default function App() {
             {collection ? <div className="collection"><h1>Words to come back to.</h1><p>Choose a letter. Stay as long as you like.</p>{messages.map((message, i) => <button key={message.id} onClick={() => changeChapter(i)}><span className="collection-number">0{i + 1}</span><span><strong>{message.title}</strong><small>{message.subtitle}</small></span><ArrowUpRightIcon/></button>)}</div> : <><Suspense fallback={<div className="letter-paper" role="status">Unfolding your letter…</div>}><Letter key={chapter} message={messages[chapter]} index={chapter} reading={reading} volume={volume} muted={muted} onEnded={finish} onNarrationPlay={() => setMuted(false)}/></Suspense><div className="chapter-navigation"><button className="text-button" disabled={chapter === 0} onClick={() => changeChapter(chapter - 1)}><ArrowLeft size={16}/> Previous letter</button><span>0{chapter + 1} — 05</span><button className="next-button" onClick={() => chapter === 4 ? finish() : changeChapter(chapter + 1)}>{chapter === 4 ? 'One final wish' : 'Next letter'}<ArrowRight size={16}/></button></div></>}
           </div>
         </motion.section>}
-        {stage === 'finale' && <motion.section key="finale" className="finale-screen" initial={reduced ? false : {opacity: 0}} animate={{opacity: 1}} transition={{duration: 1}}><div className="finale-seal" aria-hidden="true">a</div><h1>Here’s to your<br/><em>next beautiful chapter.</em></h1><p>More reasons to smile. More dreams to follow.<br/>More beautiful moments to remember.</p><span className="script">Happy birthday, {settings.recipient}.</span><span className="finale-sender">With love, {settings.sender}</span><button className="next-button" onClick={restart}><RotateCcw size={16}/> Open it all again</button><button className="text-button" onClick={() => {setStage('letters'); setCollection(true);}}>Return to the letters <ArrowRight size={15}/></button><BirthdayReply enabled={contactEnabled}/></motion.section>}
+        {stage === 'finale' && <motion.section key="finale" className="finale-screen" initial={reduced ? false : {opacity: 0}} animate={{opacity: 1}} transition={{duration: 1}}><div className="finale-seal" aria-hidden="true">a</div><h1>Here’s to your<br/><em>next beautiful chapter.</em></h1><p>More reasons to smile. More dreams to follow.<br/>More beautiful moments to remember.</p><span className="script">Happy birthday, {settings.recipient}.</span><span className="finale-sender">With love, {settings.sender}</span><button className="next-button" onClick={restart}><RotateCcw size={16}/> Open it all again</button><button className="text-button" onClick={() => {setStage('letters'); setCollection(true);}}>Return to the letters <ArrowRight size={15}/></button><BirthdayReply enabled={contactEnabled} endpoint={contact.endpoint}/></motion.section>}
       </AnimatePresence>
     </main>
     <footer className="site-footer"><span>MADE OF WORDS. FILLED WITH LOVE.</span><span>Made with care, just for {settings.recipient}.</span><span>KEEP THIS MOMENT</span></footer>
