@@ -15,11 +15,11 @@ npm run preview
 
 All five letters and recipient settings live in `src/data/messages.ts`. Current copy is explicitly sample content. Change `recipient`, `sender`, the five message bodies and signatures; set `isSample` to false only after replacing the samples. The memory chapter deliberately makes no claim about a real shared memory.
 
-All five letters now have supplied recordings, including my letter.mp3 for chapter 4. No personal photos or licensed background music were supplied. See the narration section below for timing provenance and file mapping.
+All five letters now have supplied recordings, including my letter.mp3 for chapter 4. The supplied portrait and licensed instrumental playlist are bundled; see the music attribution section below. See the narration section below for timing provenance and file mapping.
 
 1. Put approved recordings in `public/audio/`, then set each message's `audio` to a root-relative path such as `/audio/message-01.mp3`.
 2. Supply verified sentence cues (`start`, `end`, `text`) in seconds for that recording. Do not estimate timestamps from text length. With cues, playback time highlights the spoken sentence; sentences can be clicked to seek. This is sentence synchronization, not word synchronization. Without cues the complete letter stays readable.
-3. Add an approved music track and set `settings.backgroundAudio`. Music is optional and quieter than narration. Sound begins only after interaction.
+3. Configure approved playlist tracks in `src/data/music.ts` and preserve their attribution. Music is optional, quieter than narration, and pauses on the letters. Browser autoplay rules may require the first interaction.
 4. Optionally add personal images to the memory message's `images` array, with descriptive alt text. Anything in `public` is publicly accessible after deployment: use only images approved for public sharing. Do not commit private originals.
 
 The supplied seal, page and finale effects are small original synthesized tones using Web Audio; they are not physical paper recordings. Replace or extend `playEffect` with approved recordings for realistic foley.
@@ -65,3 +65,7 @@ To change recorded wording, replace the audio and regenerate its timing data tog
 ## Portrait introduction
 
 The supplied portrait is optimized as `public/images/kimberly-ann.webp` and displayed uncropped on a dedicated introduction before the sealed envelope. The image is bundled with the static website; no external image service is used. The introduction respects reduced motion, works on narrow screens, and is included when replaying the complete experience.
+
+## Background music
+
+Three licensed instrumentals by Kevin MacLeod play sequentially and repeat: There is Romance, Heartwarming, and Dream Culture. Source links and CC BY 4.0 attribution are on `/music-credits.html` and linked from sound settings. Files are re-encoded to 96 kbps for lighter delivery and hosted locally. Only the current track is loaded. Music is enabled by default at low volume, attempts autoplay, and retries after the first tap if browser policy requires it. It pauses throughout the letters (including the collection and paused narration) and resumes from its previous position on the introduction, envelope, or finale. Global mute, volume, the music checkbox and Next track remain available. One failed track is skipped; if all fail, narration and the rest of the site remain usable.

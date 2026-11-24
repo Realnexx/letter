@@ -3,7 +3,7 @@ test('gentle effects start after interaction and obey mute and effects toggle',a
  await page.addInitScript(()=>{
    const state={starts:0};(window as unknown as {effectProbe:typeof state}).effectProbe=state;
    const original=AudioBufferSourceNode.prototype.start;
-   AudioBufferSourceNode.prototype.start=function(...args:Parameters<typeof original>){state.starts++;return original.apply(this,args);};
+   AudioBufferSourceNode.prototype.start=function(...args:Parameters<typeof original>){if(this.buffer && this.buffer.length>1000)state.starts++;return original.apply(this,args);};
  });
  const starts=()=>page.evaluate(()=>(window as unknown as {effectProbe:{starts:number}}).effectProbe.starts);
  await page.goto('/');

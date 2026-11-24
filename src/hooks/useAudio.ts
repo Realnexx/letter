@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Howl, Howler } from 'howler';
-import { settings } from '../data/messages';
+import { Howl } from 'howler';
 
 // One narration owner. Chapter changes always release the previous recording.
 export function useAudio(src: string | null, volume: number, muted: boolean) {
@@ -52,14 +51,3 @@ export function useAudio(src: string | null, volume: number, muted: boolean) {
 
 export { playEffect } from '../audio/soundEffects';
 
-export function useAmbience(enabled: boolean, volume: number, muted: boolean) {
-  const ambient = useRef<Howl | null>(null);
-  useEffect(() => {
-    if (!settings.backgroundAudio || !enabled) return;
-    const audio = new Howl({src: [settings.backgroundAudio], loop: true, volume: 0});
-    ambient.current = audio; audio.play();
-    return () => { audio.unload(); ambient.current = null; };
-  }, [enabled]);
-  useEffect(() => { ambient.current?.volume(muted ? 0 : volume * .16); }, [volume, muted, enabled]);
-  useEffect(() => () => { Howler.stop(); }, []);
-}

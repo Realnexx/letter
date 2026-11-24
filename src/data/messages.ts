@@ -14,7 +14,6 @@ export interface Message {
 // All five supplied recordings use locally transcribed word timestamps.
 export const settings = {
   recipient: 'Kimberly Ann', sender: 'Someone who cares', isSample: true,
-  backgroundAudio: null as string | null,
 };
 export const messages: Message[] = [
   { id: 'birthday', title: 'The birthday letter', subtitle: 'A little celebration of you.', greeting: `Happy birthday, ${settings.recipient}.`,

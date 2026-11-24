@@ -6,7 +6,8 @@ import Envelope from './components/Envelope';
 import PortraitIntro from './components/PortraitIntro';
 const Letter = lazy(() => import('./components/Letter'));
 import { messages, settings } from './data/messages';
-import { playEffect, useAmbience } from './hooks/useAudio';
+import { playEffect } from './hooks/useAudio';
+import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 import { setEffectVolume, stopEffects, type EffectKind } from './audio/soundEffects';
 
 export default function App() {
@@ -17,10 +18,10 @@ export default function App() {
   const [muted, setMuted] = useState(false);
   const [volume, setVolume] = useState(.7);
   const [effects, setEffects] = useState(true);
-  const [music, setMusic] = useState(false);
+  const [music, setMusic] = useState(true);
   const [reading, setReading] = useState(true);
   const reduced = useReducedMotion();
-  useAmbience(music, volume, muted);
+  const ambience = useBackgroundMusic(music, stage === 'letters', volume, muted);
   useEffect(() => {setEffectVolume(muted || !effects ? 0 : volume);}, [muted, effects, volume]);
   useEffect(() => () => stopEffects(), []);
   const effect = useCallback((kind: EffectKind) => { if (effects && !muted) playEffect(kind, volume); }, [effects, muted, volume]);
@@ -42,7 +43,7 @@ export default function App() {
     <header className="site-header"><button className="brand" onClick={restart} aria-label="Return to the birthday introduction"><span className="brand-monogram">a.</span><span>A letter for her<span className="brand-subtitle">A BIRTHDAY KEEPSAKE</span></span></button>
       <div className="header-actions"><button className="sound-toggle" onClick={() => setMuted(!muted)} aria-label={muted ? 'Enable sound' : 'Mute sound'} aria-pressed={!muted}>{muted ? <VolumeX size={16}/> : <Volume2 size={16}/>}<span>Sound {muted ? 'off' : 'on'}</span></button><span className="header-divider"/><button className="icon-button" onClick={() => setShowSettings(!showSettings)} aria-label="Sound settings" aria-expanded={showSettings}><Settings2 size={18}/></button></div>
     </header>
-    {showSettings && <aside className="settings-panel" aria-label="Sound settings"><div className="settings-heading"><h2>Make yourself comfortable</h2><button className="icon-button" onClick={() => setShowSettings(false)} aria-label="Close sound settings"><X size={18}/></button></div><label className="volume-label">Volume <input aria-label="Volume" type="range" min="0" max="1" step=".05" value={volume} onChange={e => setVolume(Number(e.target.value))}/></label><label className="check-label"><input type="checkbox" checked={effects} onChange={e => setEffects(e.target.checked)}/> Gentle sound effects</label><label className="check-label"><input type="checkbox" disabled={!settings.backgroundAudio} checked={music} onChange={e => setMusic(e.target.checked)}/> Background music</label>{!settings.backgroundAudio && <p>Add a music file in the project settings to enable ambience.</p>}</aside>}
+    {showSettings && <aside className="settings-panel" aria-label="Sound settings"><div className="settings-heading"><h2>Make yourself comfortable</h2><button className="icon-button" onClick={() => setShowSettings(false)} aria-label="Close sound settings"><X size={18}/></button></div><label className="volume-label">Volume <input aria-label="Volume" type="range" min="0" max="1" step=".05" value={volume} onChange={e => setVolume(Number(e.target.value))}/></label><label className="check-label"><input type="checkbox" checked={effects} onChange={e => setEffects(e.target.checked)}/> Gentle sound effects</label><label className="check-label"><input type="checkbox" checked={music} onChange={e => setMusic(e.target.checked)}/> Background music</label>{music && <div className="music-status"><p>{stage === 'letters' ? 'Music pauses while you read and listen.' : ambience.status === 'blocked' ? 'Music begins after your first tap.' : ambience.status === 'error' ? 'Music could not load. Try the next track.' : muted ? 'Music is muted.' : 'A soft instrumental playlist, on repeat.'}</p><div><span>{ambience.track.title}</span><button className="text-button" onClick={ambience.next}>Next track <ArrowRight size={13}/></button></div></div>}<a className="music-credit-link" href="/music-credits.html" target="_blank" rel="noreferrer">Music credits</a></aside>}
     <main id="main" tabIndex={-1}>
       <AnimatePresence mode="wait">
         {stage === 'portrait' && <PortraitIntro key="portrait" onContinue={() => {void import('./components/Letter'); effect('page'); setStage('welcome'); window.scrollTo({top:0});}}/>}
@@ -61,7 +62,7 @@ export default function App() {
         {stage === 'finale' && <motion.section key="finale" className="finale-screen" initial={reduced ? false : {opacity: 0}} animate={{opacity: 1}} transition={{duration: 1}}><div className="finale-seal" aria-hidden="true">a</div><h1>Here’s to your<br/><em>next beautiful chapter.</em></h1><p>More reasons to smile. More dreams to follow.<br/>More beautiful moments to remember.</p><span className="script">Happy birthday, {settings.recipient}.</span><span className="finale-sender">With love, {settings.sender}</span><button className="next-button" onClick={restart}><RotateCcw size={16}/> Open it all again</button><button className="text-button" onClick={() => {setStage('letters'); setCollection(true);}}>Return to the letters <ArrowRight size={15}/></button></motion.section>}
       </AnimatePresence>
     </main>
-    <footer className="site-footer"><span>MADE OF WORDS. FILLED WITH LOVE.</span><span>{settings.isSample ? 'A sample keepsake · ready for your own words' : 'A little something, just for you.'}</span><span>KEEP THIS MOMENT</span></footer>
+    <footer className="site-footer"><span>MADE OF WORDS. FILLED WITH LOVE.</span><span>Made with care, just for {settings.recipient}.</span><span>KEEP THIS MOMENT</span></footer>
   </div>;
 }
 function ArrowUpRightIcon() {return <ArrowRight className="collection-arrow" size={19}/>;}
