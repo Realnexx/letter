@@ -6,20 +6,23 @@ import Envelope from './components/Envelope';
 const Letter = lazy(() => import('./components/Letter'));
 import { messages, settings } from './data/messages';
 import { playEffect, useAmbience } from './hooks/useAudio';
+import { setEffectVolume, stopEffects, type EffectKind } from './audio/soundEffects';
 
 export default function App() {
   const [stage, setStage] = useState<'welcome' | 'letters' | 'finale'>('welcome');
   const [chapter, setChapter] = useState(0);
   const [collection, setCollection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [volume, setVolume] = useState(.7);
   const [effects, setEffects] = useState(true);
   const [music, setMusic] = useState(false);
   const [reading, setReading] = useState(true);
   const reduced = useReducedMotion();
   useAmbience(music, volume, muted);
-  const effect = useCallback((kind: 'seal' | 'paper' | 'page' | 'finale') => { if (effects && !muted) playEffect(kind, volume); }, [effects, muted, volume]);
+  useEffect(() => {setEffectVolume(muted || !effects ? 0 : volume);}, [muted, effects, volume]);
+  useEffect(() => () => stopEffects(), []);
+  const effect = useCallback((kind: EffectKind) => { if (effects && !muted) playEffect(kind, volume); }, [effects, muted, volume]);
   const changeChapter = useCallback((next: number) => { if (next < 0 || next > 4) return; effect('page'); setChapter(next); setCollection(false); window.scrollTo({top: 0, behavior: 'instant'}); }, [effect]);
   const finish = useCallback(() => { setStage('finale'); effect('finale'); if (!reduced) void import('canvas-confetti').then(({default: confetti}) => confetti({particleCount: 55, spread: 65, origin: {y: .65}, colors: ['#C5A15C', '#55333C', '#e3d5b9'], disableForReducedMotion: true})); window.scrollTo({top: 0}); }, [effect, reduced]);
   useEffect(() => {

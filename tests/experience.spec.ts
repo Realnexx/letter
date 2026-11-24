@@ -5,7 +5,6 @@ test('complete keepsake journey with controls and replay', async ({ page }) => {
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('/');
   await expect(page.getByRole('heading', {name: /Kimberly Ann/})).toBeVisible();
-  await page.getByRole('button',{name:'Enable sound',exact:true}).click();
   await page.getByRole('button',{name:'Open your birthday letter'}).click();
   await expect(page.locator('#letter-title')).toHaveText('The birthday letter', {timeout:10000});
   await expect(page.getByRole('button',{name:'Play narration',exact:true})).toBeVisible();

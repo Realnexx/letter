@@ -42,25 +42,7 @@ export function useAudio(src: string | null, volume: number, muted: boolean) {
   };
 }
 
-// Short original, synthesized tones: no fabricated recordings or remote audio requests.
-let context: AudioContext | null = null;
-export function playEffect(kind: 'seal' | 'paper' | 'page' | 'finale', volume: number) {
-  if (volume <= 0) return;
-  try {
-    context ??= new AudioContext();
-    void context.resume();
-    const notes = kind === 'finale' ? [523.25, 659.25, 783.99, 1046.5] : kind === 'seal' ? [220, 330] : kind === 'paper' ? [740, 620] : [440, 554];
-    notes.forEach((frequency, i) => {
-      const oscillator = context!.createOscillator(); const gain = context!.createGain();
-      const start = context!.currentTime + i * .09;
-      oscillator.type = 'sine'; oscillator.frequency.value = frequency;
-      gain.gain.setValueAtTime(0, start); gain.gain.linearRampToValueAtTime(volume * .065, start + .015);
-      gain.gain.exponentialRampToValueAtTime(.001, start + .4);
-      oscillator.connect(gain); gain.connect(context!.destination); oscillator.start(start); oscillator.stop(start + .42);
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
-    });
-  } catch { /* Text and navigation remain available if browser audio is unavailable. */ }
-}
+export { playEffect } from '../audio/soundEffects';
 
 export function useAmbience(enabled: boolean, volume: number, muted: boolean) {
   const ambient = useRef<Howl | null>(null);

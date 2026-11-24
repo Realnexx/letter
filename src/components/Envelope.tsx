@@ -4,7 +4,7 @@ import { useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { settings } from '../data/messages';
 
-export default function Envelope({onOpen, effect}: {onOpen: () => void; effect: (kind: 'seal' | 'paper') => void}) {
+export default function Envelope({onOpen, effect}: {onOpen: () => void; effect: (kind: 'seal' | 'flap' | 'paper' | 'unfold') => void}) {
   const root = useRef<HTMLButtonElement>(null);
   const timeline = useRef<gsap.core.Timeline | null>(null);
   const [opening, setOpening] = useState(false);
@@ -16,10 +16,12 @@ export default function Envelope({onOpen, effect}: {onOpen: () => void; effect: 
     const el = root.current;
     timeline.current = gsap.timeline({onComplete: onOpen})
       .to(el.querySelector('.seal'), {scale: 1.18, opacity: 0, duration: reduced ? .01 : .32})
+      .call(() => effect('flap'))
       .to(el.querySelector('.flap'), {rotateX: -180, duration: reduced ? .01 : .8, ease: 'power2.inOut'})
       .set(el.querySelector('.flap'), {zIndex: 0})
       .call(() => effect('paper'))
       .to(el.querySelector('.insert'), {y: -155, duration: reduced ? .01 : .9, ease: 'power3.out'})
+      .call(() => effect('unfold'))
       .to(el.querySelector('.insert'), {rotateX: 0, scale: 1.1, duration: reduced ? .01 : .5})
       .to(el, {opacity: 0, y: 25, duration: reduced ? .01 : .4}, '+=.15');
   };

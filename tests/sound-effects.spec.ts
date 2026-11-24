@@ -1,0 +1,30 @@
+import {test,expect} from '@playwright/test';
+test('gentle effects start after interaction and obey mute and effects toggle',async({page})=>{
+ await page.addInitScript(()=>{
+   const state={starts:0};(window as unknown as {effectProbe:typeof state}).effectProbe=state;
+   const original=AudioBufferSourceNode.prototype.start;
+   AudioBufferSourceNode.prototype.start=function(...args:Parameters<typeof original>){state.starts++;return original.apply(this,args);};
+ });
+ const starts=()=>page.evaluate(()=>(window as unknown as {effectProbe:{starts:number}}).effectProbe.starts);
+ await page.goto('/');
+ expect(await starts()).toBe(0);
+ await page.getByRole('button',{name:'Open your birthday letter'}).click();
+ await expect(page.locator('#letter-title')).toBeVisible({timeout:10000});
+ expect(await starts()).toBeGreaterThanOrEqual(5);
+ await page.getByRole('button',{name:'Mute sound',exact:true}).click();
+ const beforeMute=await starts();
+ await page.getByRole('button',{name:'Next letter',exact:true}).click();
+ expect(await starts()).toBe(beforeMute);
+ await page.getByRole('button',{name:'Enable sound',exact:true}).click();
+ await page.getByRole('button',{name:'Sound settings',exact:true}).click();
+ await page.getByLabel('Gentle sound effects').uncheck();
+ await page.getByRole('button',{name:'Close sound settings'}).click();
+ const beforeDisabled=await starts();
+ await page.getByRole('button',{name:'Next letter',exact:true}).click();
+ expect(await starts()).toBe(beforeDisabled);
+ await page.getByRole('button',{name:'Sound settings',exact:true}).click();
+ await page.getByLabel('Gentle sound effects').check();
+ await page.getByRole('button',{name:'Close sound settings'}).click();
+ await page.getByRole('button',{name:'Next letter',exact:true}).click();
+ expect(await starts()).toBeGreaterThan(beforeDisabled);
+});
