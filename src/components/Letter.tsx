@@ -12,7 +12,7 @@ export default function Letter({message, index, reading, volume, muted, onEnded,
   const active = message.cues.findIndex(cue => audio.time >= cue.start && audio.time < cue.end);
   const sentence = useRef<HTMLButtonElement | null>(null);
   const ended = audio.duration > 0 && audio.time >= audio.duration;
-  const spoken = (text: string, block: string) => message.words?.length ? <SpokenText text={text} block={block} words={message.words} time={audio.time} follow={!reading && audio.playing}/> : text;
+  const spoken = (text: string, block: string) => message.words?.length ? <SpokenText text={text} block={block} words={message.words} time={audio.time} follow={audio.playing}/> : text;
   useEffect(() => { if (ended && index === 4) onEnded(); }, [ended, index, onEnded]);
   useEffect(() => { if (!reading && active >= 0) sentence.current?.scrollIntoView({behavior: reduced ? 'instant' : 'smooth', block: 'nearest'}); }, [active, reading, reduced]);
   return <motion.article className={`letter-paper ${message.treatment}`} initial={reduced ? false : {opacity: 0, y: 18}} animate={{opacity: 1, y: 0}} transition={{duration: .5}} aria-labelledby="letter-title">

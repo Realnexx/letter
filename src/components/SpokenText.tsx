@@ -9,7 +9,13 @@ export default function SpokenText({text, block, words, time, follow}: {text: st
   useEffect(() => {
     if (!follow || current < 0 || !active.current) return;
     const rect = active.current.getBoundingClientRect();
-    if (rect.top < 110 || rect.bottom > window.innerHeight - 100) active.current.scrollIntoView({block:'center',behavior:reduced ? 'instant' : 'smooth'});
+    const viewport = window.visualViewport;
+    const top = viewport?.offsetTop ?? 0;
+    const height = viewport?.height ?? window.innerHeight;
+    const margin = Math.min(100, height * .18);
+    if (rect.top < top + margin || rect.bottom > top + height - margin) {
+      active.current.scrollIntoView({block:'center', inline:'nearest', behavior:reduced ? 'instant' : 'smooth'});
+    }
   }, [current, follow, reduced]);
   let token = -1;
   return <>{text.split(/(\s+)/).map((part, i) => {
