@@ -1,0 +1,2 @@
+# Product
+A Letter for Her is a private-feeling, publicly hostable static birthday letter experience. The visitor opens a sealed envelope and reads exactly five configurable chapters, with optional supplied narration and a replayable finale. Personal facts, memories, photos and recordings must come from the owner. Sample content remains clearly identified until replaced. No backend, database or authentication.

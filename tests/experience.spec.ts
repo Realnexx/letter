@@ -1,0 +1,56 @@
+import { test, expect } from '@playwright/test';
+
+test('complete keepsake journey with controls and replay', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto('/');
+  await expect(page.getByRole('heading', {name: /Kimberly Ann/})).toBeVisible();
+  await page.getByRole('button',{name:'Enable sound',exact:true}).click();
+  await page.getByRole('button',{name:'Open your birthday letter'}).click();
+  await expect(page.locator('#letter-title')).toHaveText('The birthday letter', {timeout:10000});
+  await expect(page.getByRole('button',{name:'Play narration',exact:true})).toBeDisabled();
+  await page.getByRole('button',{name:'Sound settings',exact:true}).click();
+  await expect(page.getByLabel('Gentle sound effects')).toBeChecked();
+  await page.getByLabel('Gentle sound effects').uncheck();
+  await page.getByLabel('Volume',{exact:true}).fill('0.3');
+  await page.getByRole('button',{name:'Close sound settings'}).click();
+  await page.getByRole('button',{name:'Cinematic mode',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Reading mode',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'All letters',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Words to come back to.'})).toBeVisible();
+  await page.locator('.collection').getByRole('button',{name:/03 Little memories/}).click();
+  await expect(page.locator('#letter-title')).toHaveText('Little memories');
+  await page.getByRole('button',{name:'Previous letter',exact:true}).click();
+  await expect(page.locator('#letter-title')).toHaveText('Things I appreciate about you');
+  for (const title of ['Little memories','My wishes for you','One last thing']) {
+    await page.getByRole('button',{name:'Next letter',exact:true}).click();
+    await expect(page.locator('#letter-title')).toHaveText(title);
+  }
+  await page.getByRole('button',{name:'One final wish',exact:true}).click();
+  await expect(page.getByRole('heading',{name:/next beautiful chapter/})).toBeVisible();
+  await page.getByRole('button',{name:'Open it all again',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Open your birthday letter'})).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+for (const width of [320,390,768,1440]) {
+  test(`responsive layout ${width} and reduced-motion journey`, async ({page}) => {
+    await page.setViewportSize({width,height:900});
+    await page.emulateMedia({reducedMotion:'reduce'});
+    await page.goto('/');
+    await expect(page.getByRole('button',{name:'Open your birthday letter'})).toBeInViewport();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({path:`test-results/welcome-${width}.png`,fullPage:true});
+    await page.getByRole('button',{name:'Open your birthday letter'}).click();
+    await expect(page.locator('#letter-title')).toBeVisible();
+    await expect(page.locator('.reading-layout')).toHaveCSS('opacity','1');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({path:`test-results/letter-${width}.png`,fullPage:true});
+    await page.locator('#main').focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#letter-title')).toHaveText('Things I appreciate about you');
+  });
+}
+
+
+
