@@ -79,3 +79,7 @@
 .welcome-heading,.welcome-bottom{transition:opacity .45s ease}
 .welcome-screen:has(.envelope.opening) .welcome-heading,
 .welcome-screen:has(.envelope.opening) .welcome-bottom{opacity:.16}
+
+.spoken-word{color:inherit;background:transparent;border-radius:3px;padding:1px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background-color .1s ease,box-shadow .1s ease}
+.spoken-word.is-speaking{background:#e7ce91;box-shadow:0 2px 0 #c5a15c;color:#482731}
+@media(prefers-reduced-motion:reduce){.spoken-word{transition:none}}

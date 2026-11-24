@@ -8,7 +8,7 @@ test('complete keepsake journey with controls and replay', async ({ page }) => {
   await page.getByRole('button',{name:'Enable sound',exact:true}).click();
   await page.getByRole('button',{name:'Open your birthday letter'}).click();
   await expect(page.locator('#letter-title')).toHaveText('The birthday letter', {timeout:10000});
-  await expect(page.getByRole('button',{name:'Play narration',exact:true})).toBeDisabled();
+  await expect(page.getByRole('button',{name:'Play narration',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Sound settings',exact:true}).click();
   await expect(page.getByLabel('Gentle sound effects')).toBeChecked();
   await page.getByLabel('Gentle sound effects').uncheck();
@@ -79,3 +79,4 @@ test('opening letter stays opaque and in front of the welcome copy', async ({pag
   await page.screenshot({path:'test-results/envelope-opening.png'});
   await expect(page.locator('#letter-title')).toHaveText('The birthday letter');
 });
+

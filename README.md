@@ -15,7 +15,7 @@ npm run preview
 
 All five letters and recipient settings live in `src/data/messages.ts`. Current copy is explicitly sample content. Change `recipient`, `sender`, the five message bodies and signatures; set `isSample` to false only after replacing the samples. The memory chapter deliberately makes no claim about a real shared memory.
 
-No personal photos, narration or licensed background music were supplied. These assets are not generated or silently substituted. Each chapter has a distinct intended voice direction; actual narrator voices require five real recordings.
+Four supplied recordings are bundled for chapters 1, 2, 3 and 5; chapter 4 awaits its recording. No personal photos or licensed background music were supplied. See the narration section below for timing provenance and file mapping.
 
 1. Put approved recordings in `public/audio/`, then set each message's `audio` to a root-relative path such as `/audio/message-01.mp3`.
 2. Supply verified sentence cues (`start`, `end`, `text`) in seconds for that recording. Do not estimate timestamps from text length. With cues, playback time highlights the spoken sentence; sentences can be clicked to seek. This is sentence synchronization, not word synchronization. Without cues the complete letter stays readable.
@@ -46,3 +46,12 @@ Import this repository, use the Vite preset, build command `npm run build`, outp
 ## Printed QR gift card
 
 Open `/gift-card.html` for Kimberly Ann's matching A6 gift-card studio. After publishing the website, paste its public HTTPS URL, create the QR code, then print/save PDF or download the card PNG and QR SVG. On a public HTTPS deployment the studio initializes with that site's home URL. Localhost, local-network addresses, and GitHub source-code links are rejected. The QR uses high error correction, a four-module white quiet zone, burgundy modules and no overlaid logo. The PNG is 1240 × 1748 pixels (A6 at approximately 300 dpi). A scannable final code cannot be created until the public website link exists. Always scan a printed proof before gifting.
+
+## Supplied narration and word highlighting
+
+Recordings are now bundled for chapters 1 (`vm1.mp3`), 2 (`vm2.mp3`), 3 (`vm4new.mp3`, matched by its actual spoken content), and 5 (`vm5.mp3`). Chapter 4 remains text-only until its matching recording is supplied. No recordings are generated or reused over unrelated text.
+
+`src/data/narration-words.json` contains word timestamps from local faster-whisper base.en transcription, aligned to the existing display text. Gold highlighting follows Howler's playback clock, including after seek, pause, resume and replay. These are automatic acoustic timings, not manually certified boundaries; a zero-duration ASR word is omitted rather than inventing its timing. Unspoken headings and signatures remain visible without an artificial highlight. Read and listen together in either mode; cinematic mode also brings the active text into view. Reduced motion preserves highlighting without animated transitions. Starting narration explicitly enables sound; the global mute and volume controls still apply.
+
+To change recorded wording, replace the audio and regenerate its timing data together. Never stretch these cues to fit a new recording or estimate word positions from character counts. Temporary transcription libraries, models, and intermediate files stay in ignored `tmp/` and are not shipped or required by the static website.
+

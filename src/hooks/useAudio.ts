@@ -26,8 +26,14 @@ export function useAudio(src: string | null, volume: number, muted: boolean) {
   useEffect(() => { sound.current?.volume(muted ? 0 : volume); }, [volume, muted, status]);
   useEffect(() => {
     if (!playing) return;
-    const timer = window.setInterval(() => setTime(Number(sound.current?.seek()) || 0), 100);
-    return () => window.clearInterval(timer);
+    let frame = 0;
+    let previous = 0;
+    const tick = (now: number) => {
+      if (now - previous >= 30) {setTime(Number(sound.current?.seek()) || 0); previous = now;}
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
   }, [playing]);
   return {playing, time, duration, status,
     toggle: () => { const a = sound.current; if (!a || status !== 'ready') return; if (a.playing()) a.pause(); else a.play(); },
