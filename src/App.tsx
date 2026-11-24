@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowRight, Volume2, VolumeX, Settings2, X, BookOpen, Film, 
 
 import Envelope from './components/Envelope';
 import PortraitIntro from './components/PortraitIntro';
+import BirthdayReply from './components/BirthdayReply';
+import { useContact } from './hooks/useContact';
 const Letter = lazy(() => import('./components/Letter'));
 import { messages, settings } from './data/messages';
 import { playEffect } from './hooks/useAudio';
@@ -21,6 +23,7 @@ export default function App() {
   const [music, setMusic] = useState(true);
   const [reading, setReading] = useState(true);
   const reduced = useReducedMotion();
+  const contactEnabled = useContact();
   const ambience = useBackgroundMusic(music, stage === 'letters', volume, muted);
   useEffect(() => {setEffectVolume(muted || !effects ? 0 : volume);}, [muted, effects, volume]);
   useEffect(() => () => stopEffects(), []);
@@ -46,7 +49,7 @@ export default function App() {
     {showSettings && <aside className="settings-panel" aria-label="Sound settings"><div className="settings-heading"><h2>Make yourself comfortable</h2><button className="icon-button" onClick={() => setShowSettings(false)} aria-label="Close sound settings"><X size={18}/></button></div><label className="volume-label">Volume <input aria-label="Volume" type="range" min="0" max="1" step=".05" value={volume} onChange={e => setVolume(Number(e.target.value))}/></label><label className="check-label"><input type="checkbox" checked={effects} onChange={e => setEffects(e.target.checked)}/> Gentle sound effects</label><label className="check-label"><input type="checkbox" checked={music} onChange={e => setMusic(e.target.checked)}/> Background music</label>{music && <div className="music-status"><p>{stage === 'letters' ? 'Music pauses while you read and listen.' : ambience.status === 'blocked' ? 'Music begins after your first tap.' : ambience.status === 'error' ? 'Music could not load. Try the next track.' : muted ? 'Music is muted.' : 'A soft instrumental playlist, on repeat.'}</p><div><span>{ambience.track.title}</span><button className="text-button" onClick={ambience.next}>Next track <ArrowRight size={13}/></button></div></div>}<a className="music-credit-link" href="/music-credits.html" target="_blank" rel="noreferrer">Music credits</a></aside>}
     <main id="main" tabIndex={-1}>
       <AnimatePresence mode="wait">
-        {stage === 'portrait' && <PortraitIntro key="portrait" onContinue={() => {void import('./components/Letter'); effect('page'); setStage('welcome'); window.scrollTo({top:0});}}/>}
+        {stage === 'portrait' && <PortraitIntro contactEnabled={contactEnabled} key="portrait" onContinue={() => {void import('./components/Letter'); effect('page'); setStage('welcome'); window.scrollTo({top:0});}}/>}
         {stage === 'welcome' && <motion.section key="welcome" className="welcome-screen" exit={{opacity: 0}} transition={{duration: reduced ? 0 : .3}}>
           <div className="welcome-heading"><h1>{settings.recipient},<br/>this letter is <em>for you.</em></h1><p>Five little chapters. One very special person.<br/>A birthday wish, waiting to be opened.</p></div>
           <Envelope onOpen={() => setStage('letters')} effect={effect}/>
@@ -59,7 +62,7 @@ export default function App() {
             {collection ? <div className="collection"><h1>Words to come back to.</h1><p>Choose a letter. Stay as long as you like.</p>{messages.map((message, i) => <button key={message.id} onClick={() => changeChapter(i)}><span className="collection-number">0{i + 1}</span><span><strong>{message.title}</strong><small>{message.subtitle}</small></span><ArrowUpRightIcon/></button>)}</div> : <><Suspense fallback={<div className="letter-paper" role="status">Unfolding your letter…</div>}><Letter key={chapter} message={messages[chapter]} index={chapter} reading={reading} volume={volume} muted={muted} onEnded={finish} onNarrationPlay={() => setMuted(false)}/></Suspense><div className="chapter-navigation"><button className="text-button" disabled={chapter === 0} onClick={() => changeChapter(chapter - 1)}><ArrowLeft size={16}/> Previous letter</button><span>0{chapter + 1} — 05</span><button className="next-button" onClick={() => chapter === 4 ? finish() : changeChapter(chapter + 1)}>{chapter === 4 ? 'One final wish' : 'Next letter'}<ArrowRight size={16}/></button></div></>}
           </div>
         </motion.section>}
-        {stage === 'finale' && <motion.section key="finale" className="finale-screen" initial={reduced ? false : {opacity: 0}} animate={{opacity: 1}} transition={{duration: 1}}><div className="finale-seal" aria-hidden="true">a</div><h1>Here’s to your<br/><em>next beautiful chapter.</em></h1><p>More reasons to smile. More dreams to follow.<br/>More beautiful moments to remember.</p><span className="script">Happy birthday, {settings.recipient}.</span><span className="finale-sender">With love, {settings.sender}</span><button className="next-button" onClick={restart}><RotateCcw size={16}/> Open it all again</button><button className="text-button" onClick={() => {setStage('letters'); setCollection(true);}}>Return to the letters <ArrowRight size={15}/></button></motion.section>}
+        {stage === 'finale' && <motion.section key="finale" className="finale-screen" initial={reduced ? false : {opacity: 0}} animate={{opacity: 1}} transition={{duration: 1}}><div className="finale-seal" aria-hidden="true">a</div><h1>Here’s to your<br/><em>next beautiful chapter.</em></h1><p>More reasons to smile. More dreams to follow.<br/>More beautiful moments to remember.</p><span className="script">Happy birthday, {settings.recipient}.</span><span className="finale-sender">With love, {settings.sender}</span><button className="next-button" onClick={restart}><RotateCcw size={16}/> Open it all again</button><button className="text-button" onClick={() => {setStage('letters'); setCollection(true);}}>Return to the letters <ArrowRight size={15}/></button><BirthdayReply enabled={contactEnabled}/></motion.section>}
       </AnimatePresence>
     </main>
     <footer className="site-footer"><span>MADE OF WORDS. FILLED WITH LOVE.</span><span>Made with care, just for {settings.recipient}.</span><span>KEEP THIS MOMENT</span></footer>

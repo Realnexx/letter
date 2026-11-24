@@ -1,6 +1,6 @@
 # A Letter for Her
 
-An entirely static, mobile-first birthday keepsake built with React, TypeScript, Vite, Tailwind CSS, GSAP, Motion, Howler and locally bundled fonts.
+A mobile-first birthday keepsake with a static frontend and optional Vercel email endpoint built with React, TypeScript, Vite, Tailwind CSS, GSAP, Motion, Howler and locally bundled fonts.
 
 ## Run
 
@@ -41,7 +41,7 @@ Playwright uses a local production preview, exercises the envelope, all chapters
 
 ## Deploy to Vercel
 
-Import this repository, use the Vite preset, build command `npm run build`, output `dist`. `vercel.json` supplies these settings. No environment variables are needed. Before sharing, verify the deployed URL on a phone and check the actual approved recordings, timing cues and image permissions. This project has not been published automatically.
+Import this repository, use the Vite preset, build command `npm run build`, output `dist`. `vercel.json` supplies these settings. The core letter experience needs no environment variables. Email features need the server-only settings documented below. Before sharing, verify the deployed URL on a phone and check the actual approved recordings, timing cues and image permissions. This project has not been published automatically.
 
 ## Printed QR gift card
 
@@ -69,3 +69,22 @@ The supplied portrait is optimized as `public/images/kimberly-ann.webp` and disp
 ## Background music
 
 Three licensed instrumentals by Kevin MacLeod play sequentially and repeat: There is Romance, Heartwarming, and Dream Culture. Source links and CC BY 4.0 attribution are on `/music-credits.html` and linked from sound settings. Files are re-encoded to 96 kbps for lighter delivery and hosted locally. Only the current track is loaded. Music is enabled by default at low volume, attempts autoplay, and retries after the first tap if browser policy requires it. It pauses throughout the letters (including the collection and paused narration) and resumes from its previous position on the introduction, envelope, or finale. Global mute, volume, the music checkbox and Next track remain available. One failed track is skipped; if all fail, narration and the rest of the site remain usable.
+
+## Visit notices and optional replies
+
+The owner requested email notifications and an optional reply form. This adds one Vercel Node function, `api/contact.ts`; the rest of the experience remains static. It uses Resend over HTTPS. No database or visitor account is introduced. The recipient email and API key are server-only and never appear in the browser bundle.
+
+Required **Production** Vercel environment variables:
+
+- `CONTACT_TO_EMAIL`: the owner's destination email.
+- `CONTACT_FROM_EMAIL`: an approved Resend sender. `Birthday Keepsake <onboarding@resend.dev>` works only for delivery to the verified owner of the Resend account. For other recipients, verify a sender domain.
+- `CONTACT_SITE_URL`: the exact public origin, currently `https://letter-ten-theta.vercel.app`.
+- `RESEND_API_KEY`: a Resend sending key. Never prefix it with `VITE_` or commit it. Set it privately in Vercel, then redeploy.
+
+The first three settings are configured on the Vercel project. Email delivery is inactive until a valid Resend key is added and the app redeployed. The API reports `enabled:false` if configuration is incomplete; the form then states that replies are unavailable instead of pretending to send. Local Vite preview does not run Vercel functions; use `vercel dev` for end-to-end local backend work. Tests mock delivery and never send real email.
+
+Once enabled, the introduction displays a visit notice. A foreground visit lasting at least 1.5 seconds triggers one notification per browser tab session. Session storage holds a random event ID and sent flag; there are no cross-site identifiers or fingerprinting. Provider idempotency suppresses duplicate submissions for 24 hours. `?preview=1` suppresses automatic visit notices for the owner's checks. Alerts do not establish identity: the owner's visits and automated browsers may also trigger them. No visitor location, IP or device details are sent in the emails.
+
+At the finale, the optional form asks for a message, optional self-reported name, and explicit confirmation to send. It preserves drafts on failure, reports success only after provider acceptance, and uses idempotent retries. The name is not verified. Messages are delivered to the owner's inbox and processed by Resend; they are not published on the website or written to application logs.
+
+The endpoint accepts same-origin JSON requests, validates message lengths, ignores a honeypot, and applies a bounded 15-minute in-memory hashed-IP rate guard. This is a per-instance abuse guard, not a distributed quota; production-wide limits can be added through Vercel Firewall if needed. Do not describe the endpoint as authenticated or the sender's identity as verified.
