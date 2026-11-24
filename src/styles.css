@@ -72,3 +72,10 @@
 }
 @media(max-width:360px){.brand{font-size:20px}.brand-subtitle{font-size:6.5px}.welcome-screen{padding-top:24px}.welcome-heading h1{font-size:44px}.welcome-heading p{font-size:12px}.envelope{width:275px;height:180px}.seal{top:68px}.envelope-stage{margin-top:43px}.envelope-address{font-size:17px}.open-invitation{font-size:10px}.letter-paper{padding:26px 21px}.letter-title-row h1{font-size:35px}.chapter-ornament{width:30px;height:30px}.letter-greeting{font-size:35px}.letter-body{font-size:22px}.next-button{padding:13px}.audio-status{font-size:10px}}
 
+
+/* The opening is the foreground moment, even while its button is disabled. */
+.envelope-stage{z-index:2}
+.envelope:disabled{opacity:1;cursor:wait}
+.welcome-heading,.welcome-bottom{transition:opacity .45s ease}
+.welcome-screen:has(.envelope.opening) .welcome-heading,
+.welcome-screen:has(.envelope.opening) .welcome-bottom{opacity:.16}

@@ -54,3 +54,28 @@ for (const width of [320,390,768,1440]) {
 
 
 
+
+test('opening letter stays opaque and in front of the welcome copy', async ({page}) => {
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto('/');
+  await page.getByRole('button',{name:'Open your birthday letter'}).click();
+  await expect(page.locator('.envelope')).toBeDisabled();
+  await expect(page.locator('.envelope')).toHaveCSS('opacity','1');
+  await page.waitForFunction(()=>{
+    const el=document.querySelector('.insert');
+    return el && new DOMMatrix(getComputedStyle(el).transform).m42 < -110;
+  });
+  const layering=await page.evaluate(()=>{
+    const paper=document.querySelector('.insert')!;
+    const r=paper.getBoundingClientRect();
+    const stack=document.elementsFromPoint(r.x+r.width/2,r.y+30);
+    const paperIndex=stack.findIndex(el=>el===paper||paper.contains(el));
+    const textIndex=stack.findIndex(el=>el.closest('.welcome-heading'));
+    return {paperIndex,textIndex,opacity:getComputedStyle(document.querySelector('.envelope')!).opacity};
+  });
+  expect(layering.paperIndex).toBeGreaterThanOrEqual(0);
+  expect(layering.textIndex===-1||layering.paperIndex<layering.textIndex).toBe(true);
+  expect(layering.opacity).toBe('1');
+  await page.screenshot({path:'test-results/envelope-opening.png'});
+  await expect(page.locator('#letter-title')).toHaveText('The birthday letter');
+});
