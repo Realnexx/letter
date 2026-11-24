@@ -72,19 +72,17 @@ Three licensed instrumentals by Kevin MacLeod play sequentially and repeat: Ther
 
 ## Visit notices and optional replies
 
-The owner requested email notifications and an optional reply form. This adds one Vercel Node function, `api/contact.ts`; the rest of the experience remains static. It uses Resend over HTTPS. No database or visitor account is introduced. The recipient email and API key are server-only and never appear in the browser bundle.
+The owner requested email notifications and an optional reply form. One Vercel Node function, api/contact.ts, forwards accepted submissions to FormSubmit over HTTPS. The rest of the experience remains static, with no database or visitor account. The destination email is server-only and does not appear in the browser bundle. Resend and API keys are no longer required.
 
-Required **Production** Vercel environment variables:
+Production Vercel settings:
+- CONTACT_TO_EMAIL: the owner's receiving address (already configured privately).
+- CONTACT_SITE_URL: https://letter-ten-theta.vercel.app (already configured).
+- FORMSUBMIT_ACTIVATED: set to true only after the recipient clicks Activate Form in FormSubmit's confirmation email and a setup submission is acknowledged.
 
-- `CONTACT_TO_EMAIL`: the owner's destination email.
-- `CONTACT_FROM_EMAIL`: an approved Resend sender. `Birthday Keepsake <onboarding@resend.dev>` works only for delivery to the verified owner of the Resend account. For other recipients, verify a sender domain.
-- `CONTACT_SITE_URL`: the exact public origin, currently `https://letter-ten-theta.vercel.app`.
-- `RESEND_API_KEY`: a Resend sending key. Never prefix it with `VITE_` or commit it. Set it privately in Vercel, then redeploy.
+The owner confirmed FormSubmit activation and a clearly labeled test was acknowledged successfully. The production activation flag is configured. If activation is later disabled or configuration is incomplete, the endpoint reports enabled:false and the form honestly states that replies are unavailable. After activation, set the flag and redeploy. Vite preview does not run Vercel functions; use vercel dev for local backend work. Automated tests mock the provider and send no real emails.
 
-The first three settings are configured on the Vercel project. Email delivery is inactive until a valid Resend key is added and the app redeployed. The API reports `enabled:false` if configuration is incomplete; the form then states that replies are unavailable instead of pretending to send. Local Vite preview does not run Vercel functions; use `vercel dev` for end-to-end local backend work. Tests mock delivery and never send real email.
+When active, the introduction displays a visit notice. A foreground visit lasting at least 1.5 seconds triggers one notice per browser tab session. Session storage holds a random event ID and sent flag, not a cross-site identifier. Add ?preview=1 to suppress visit notices during owner checks. A visit is not proof of identity: owner visits and automated browsers can also trigger it. Visitor IP, location and device information are not put in the outgoing email.
 
-Once enabled, the introduction displays a visit notice. A foreground visit lasting at least 1.5 seconds triggers one notification per browser tab session. Session storage holds a random event ID and sent flag; there are no cross-site identifiers or fingerprinting. Provider idempotency suppresses duplicate submissions for 24 hours. `?preview=1` suppresses automatic visit notices for the owner's checks. Alerts do not establish identity: the owner's visits and automated browsers may also trigger them. No visitor location, IP or device details are sent in the emails.
+The finale offers an optional message, optional self-reported name and explicit consent to send. Drafts remain on failure, and success requires FormSubmit's explicit success response (including its string true format). A 200 response with success:false, such as pending activation, is a failure. FormSubmit processes messages and retains submissions for 30 days under its published documentation: https://formsubmit.co/documentation . Messages are not published on the website or put in application logs.
 
-At the finale, the optional form asks for a message, optional self-reported name, and explicit confirmation to send. It preserves drafts on failure, reports success only after provider acceptance, and uses idempotent retries. The name is not verified. Messages are delivered to the owner's inbox and processed by Resend; they are not published on the website or written to application logs.
-
-The endpoint accepts same-origin JSON requests, validates message lengths, ignores a honeypot, and applies a bounded 15-minute in-memory hashed-IP rate guard. This is a per-instance abuse guard, not a distributed quota; production-wide limits can be added through Vercel Firewall if needed. Do not describe the endpoint as authenticated or the sender's identity as verified.
+Same-origin JSON, input limits, a honeypot and a bounded 15-minute hashed-IP per-instance rate guard reduce abuse. A bounded per-instance acknowledgement cache and in-flight request coalescing reduce duplicates for 24 hours. Unlike Resend, FormSubmit offers no documented provider-wide idempotency key: duplicates across server restarts or separate instances are possible. This is neither a distributed quota nor verified visitor identity. Configure Vercel Firewall if production-wide request limits are needed.
