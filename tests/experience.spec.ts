@@ -18,11 +18,11 @@ test('complete keepsake journey with controls and replay', async ({ page }) => {
   await expect(page.getByRole('button',{name:'Reading mode',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'All letters',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Words to come back to.'})).toBeVisible();
-  await page.locator('.collection').getByRole('button',{name:/03 Little memories/}).click();
-  await expect(page.locator('#letter-title')).toHaveText('Little memories');
+  await page.locator('.collection').getByRole('button',{name:/03 What you mean to me/}).click();
+  await expect(page.locator('#letter-title')).toHaveText('What you mean to me');
   await page.getByRole('button',{name:'Previous letter',exact:true}).click();
   await expect(page.locator('#letter-title')).toHaveText('Things I appreciate about you');
-  for (const title of ['Little memories','My wishes for you','One last thing']) {
+  for (const title of ['What you mean to me','My wishes for you','One last thing']) {
     await page.getByRole('button',{name:'Next letter',exact:true}).click();
     await expect(page.locator('#letter-title')).toHaveText(title);
   }
