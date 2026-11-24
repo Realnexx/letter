@@ -4,6 +4,7 @@ test('complete keepsake journey with controls and replay', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('/');
+  await page.getByRole('button',{name:'A letter is waiting',exact:true}).click();
   await expect(page.getByRole('heading', {name: /Kimberly Ann/})).toBeVisible();
   await page.getByRole('button',{name:'Open your birthday letter'}).click();
   await expect(page.locator('#letter-title')).toHaveText('The birthday letter', {timeout:10000});
@@ -28,7 +29,7 @@ test('complete keepsake journey with controls and replay', async ({ page }) => {
   await page.getByRole('button',{name:'One final wish',exact:true}).click();
   await expect(page.getByRole('heading',{name:/next beautiful chapter/})).toBeVisible();
   await page.getByRole('button',{name:'Open it all again',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Open your birthday letter'})).toBeVisible();
+  await expect(page.getByRole('button',{name:'A letter is waiting',exact:true})).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -37,6 +38,7 @@ for (const width of [320,390,768,1440]) {
     await page.setViewportSize({width,height:900});
     await page.emulateMedia({reducedMotion:'reduce'});
     await page.goto('/');
+  await page.getByRole('button',{name:'A letter is waiting',exact:true}).click();
     await expect(page.getByRole('button',{name:'Open your birthday letter'})).toBeInViewport();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({path:`test-results/welcome-${width}.png`,fullPage:true});
@@ -57,6 +59,7 @@ for (const width of [320,390,768,1440]) {
 test('opening letter stays opaque and in front of the welcome copy', async ({page}) => {
   await page.setViewportSize({width:1440,height:900});
   await page.goto('/');
+  await page.getByRole('button',{name:'A letter is waiting',exact:true}).click();
   await page.getByRole('button',{name:'Open your birthday letter'}).click();
   await expect(page.locator('.envelope')).toBeDisabled();
   await expect(page.locator('.envelope')).toHaveCSS('opacity','1');

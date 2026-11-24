@@ -61,3 +61,7 @@ To change recorded wording, replace the audio and regenerate its timing data tog
 `src/audio/soundEffects.ts` creates original, quiet procedural paper rustles for seal release, flap opening, letter extraction, unfolding and page turns, plus a soft three-note closing chime. Sound is enabled initially but nothing plays until a user interaction. The global volume/mute and independent sound-effects checkbox control these effects; narration uses its own playback path. Rapid interactions stop previous effects rather than stacking them. The audio nodes release themselves when finished, and active effects stop when muted, disabled or the experience unmounts. Letter content is unchanged; all five chapters now have recordings.
 
 
+
+## Portrait introduction
+
+The supplied portrait is optimized as `public/images/kimberly-ann.webp` and displayed uncropped on a dedicated introduction before the sealed envelope. The image is bundled with the static website; no external image service is used. The introduction respects reduced motion, works on narrow screens, and is included when replaying the complete experience.

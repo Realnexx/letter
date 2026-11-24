@@ -7,7 +7,8 @@ test('gentle effects start after interaction and obey mute and effects toggle',a
  });
  const starts=()=>page.evaluate(()=>(window as unknown as {effectProbe:{starts:number}}).effectProbe.starts);
  await page.goto('/');
- expect(await starts()).toBe(0);
+  await page.getByRole('button',{name:'A letter is waiting',exact:true}).click();
+ expect(await starts()).toBe(2);
  await page.getByRole('button',{name:'Open your birthday letter'}).click();
  await expect(page.locator('#letter-title')).toBeVisible({timeout:10000});
  expect(await starts()).toBeGreaterThanOrEqual(5);

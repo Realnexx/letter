@@ -3,13 +3,14 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ArrowRight, Volume2, VolumeX, Settings2, X, BookOpen, Film, RotateCcw, Mail, Check } from 'lucide-react';
 
 import Envelope from './components/Envelope';
+import PortraitIntro from './components/PortraitIntro';
 const Letter = lazy(() => import('./components/Letter'));
 import { messages, settings } from './data/messages';
 import { playEffect, useAmbience } from './hooks/useAudio';
 import { setEffectVolume, stopEffects, type EffectKind } from './audio/soundEffects';
 
 export default function App() {
-  const [stage, setStage] = useState<'welcome' | 'letters' | 'finale'>('welcome');
+  const [stage, setStage] = useState<'portrait' | 'welcome' | 'letters' | 'finale'>('portrait');
   const [chapter, setChapter] = useState(0);
   const [collection, setCollection] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -34,16 +35,17 @@ export default function App() {
     };
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey);
   }, [chapter, stage, collection, showSettings, changeChapter]);
-  const restart = () => {setStage('welcome'); setChapter(0); setCollection(false);};
+  const restart = () => {setStage('portrait'); setChapter(0); setCollection(false);};
 
   return <div className={`experience ${stage} ${reading ? 'reading-mode' : 'cinematic-mode'}`}>
     <a className="skip-link" href="#main">Skip to letter</a>
-    <header className="site-header"><button className="brand" onClick={restart} aria-label="Return to the sealed letter"><span className="brand-monogram">a.</span><span>A letter for her<span className="brand-subtitle">A BIRTHDAY KEEPSAKE</span></span></button>
+    <header className="site-header"><button className="brand" onClick={restart} aria-label="Return to the birthday introduction"><span className="brand-monogram">a.</span><span>A letter for her<span className="brand-subtitle">A BIRTHDAY KEEPSAKE</span></span></button>
       <div className="header-actions"><button className="sound-toggle" onClick={() => setMuted(!muted)} aria-label={muted ? 'Enable sound' : 'Mute sound'} aria-pressed={!muted}>{muted ? <VolumeX size={16}/> : <Volume2 size={16}/>}<span>Sound {muted ? 'off' : 'on'}</span></button><span className="header-divider"/><button className="icon-button" onClick={() => setShowSettings(!showSettings)} aria-label="Sound settings" aria-expanded={showSettings}><Settings2 size={18}/></button></div>
     </header>
     {showSettings && <aside className="settings-panel" aria-label="Sound settings"><div className="settings-heading"><h2>Make yourself comfortable</h2><button className="icon-button" onClick={() => setShowSettings(false)} aria-label="Close sound settings"><X size={18}/></button></div><label className="volume-label">Volume <input aria-label="Volume" type="range" min="0" max="1" step=".05" value={volume} onChange={e => setVolume(Number(e.target.value))}/></label><label className="check-label"><input type="checkbox" checked={effects} onChange={e => setEffects(e.target.checked)}/> Gentle sound effects</label><label className="check-label"><input type="checkbox" disabled={!settings.backgroundAudio} checked={music} onChange={e => setMusic(e.target.checked)}/> Background music</label>{!settings.backgroundAudio && <p>Add a music file in the project settings to enable ambience.</p>}</aside>}
     <main id="main" tabIndex={-1}>
       <AnimatePresence mode="wait">
+        {stage === 'portrait' && <PortraitIntro key="portrait" onContinue={() => {void import('./components/Letter'); effect('page'); setStage('welcome'); window.scrollTo({top:0});}}/>}
         {stage === 'welcome' && <motion.section key="welcome" className="welcome-screen" exit={{opacity: 0}} transition={{duration: reduced ? 0 : .3}}>
           <div className="welcome-heading"><h1>{settings.recipient},<br/>this letter is <em>for you.</em></h1><p>Five little chapters. One very special person.<br/>A birthday wish, waiting to be opened.</p></div>
           <Envelope onOpen={() => setStage('letters')} effect={effect}/>

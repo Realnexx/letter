@@ -14,6 +14,7 @@ for (const message of messages.filter(m=>m.audio && m.words?.length)) {
   test(`word highlighting, seek, pause, replay and cleanup: ${message.id}`, async ({page})=>{
     await page.emulateMedia({reducedMotion:'reduce'});
     await page.goto('/');
+  await page.getByRole('button',{name:'A letter is waiting',exact:true}).click();
     await page.getByRole('button',{name:'Open your birthday letter'}).click();
     await expect(page.locator('#letter-title')).toBeVisible();
     const index=messages.findIndex(m=>m.id===message.id);
@@ -42,6 +43,7 @@ for (const message of messages.filter(m=>m.audio && m.words?.length)) {
 test('autoplay respects mute and changing volume does not resume paused narration',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('/');
+  await page.getByRole('button',{name:'A letter is waiting',exact:true}).click();
   await page.getByRole('button',{name:'Mute sound',exact:true}).click();
   await page.getByRole('button',{name:'Open your birthday letter'}).click();
   await expect(page.getByRole('button',{name:'Pause narration',exact:true})).toBeVisible();
@@ -68,6 +70,7 @@ test('browser autoplay restriction offers a working one-tap fallback',async({pag
   });
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('/');
+  await page.getByRole('button',{name:'A letter is waiting',exact:true}).click();
   await page.getByRole('button',{name:'Open your birthday letter'}).click();
   await expect(page.getByRole('status')).toHaveText('Tap play once to enable narration in this browser.');
   const play=page.getByRole('button',{name:'Play narration',exact:true});
