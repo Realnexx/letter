@@ -16,7 +16,7 @@ document.querySelector<HTMLDivElement>('#card-root')!.innerHTML = `
       <form id="link-form"><label for="website-url">Published website link</label><input type="url" id="website-url" placeholder="https://your-website.com" required autocomplete="url"/><p class="field-help">Publish the letter first, then paste its public link. Everything is generated on this device.</p><button type="submit" class="primary-button">Create her QR code <span>↗</span></button></form>
       <p id="card-status" role="status">The design is ready. Add a published link to create the scannable code.</p>
       <div class="export-actions"><button id="print" disabled>Print / save PDF</button><button id="download-card" disabled>Download card · PNG</button><button id="download-qr" disabled>Download QR · SVG</button></div>
-      <p class="print-help">2 × 3.5 inches · portrait card<br/>Print at 100% with background graphics enabled. Scan the printed card with your phone before gifting it.</p>
+      <p class="print-help">2 × 3.5 inch card · top-left on A4<br/>Print at 100% with background graphics enabled. Scan the printed card with your phone before gifting it.</p>
     </section>
     <section class="card-preview" aria-label="Gift card preview"><div id="gift-card" class="gift-card">
       <div class="card-frame"><div class="card-monogram" aria-hidden="true">k<span>a</span></div>

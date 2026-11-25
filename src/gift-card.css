@@ -24,10 +24,11 @@ form{margin-top:40px}label{display:block;font-size:13px;margin-bottom:10px}input
 @media(max-width:900px){.studio-layout{gap:40px;grid-template-columns:1fr 290px;padding:0 25px}.studio-tools h1{font-size:42px}}
 @media(max-width:700px){.studio-header{padding:20px}.studio-header a span{font-size:20px}.studio-header>span{font-size:8px}.studio-layout{display:flex;flex-direction:column;padding:0 20px;margin:10px auto 45px;gap:35px;align-items:stretch}.studio-tools h1{font-size:44px}.card-preview{align-self:center}}
 @media(max-width:360px){.card-preview{--preview-scale:1.3}.studio-tools h1{font-size:40px}}
-@page{size:2in 3.5in;margin:0}
+@page{size:A4 portrait;margin:10mm}
 @media print{
- html,body{width:2in;height:3.5in;margin:0!important;padding:0!important;background:#f5f0e7;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ :root{background:#fff}
+ html,body{width:auto;height:auto;margin:0!important;padding:0!important;background:#fff;print-color-adjust:exact;-webkit-print-color-adjust:exact}
  .studio-header,.studio-tools{display:none!important}
- .studio-layout,.card-preview{display:block!important;margin:0!important;padding:0!important;width:2in;height:3.5in}
+ .studio-layout,.card-preview{display:block!important;margin:0!important;padding:0!important;width:2in;height:3.5in;max-width:none;position:static;float:none}
  .gift-card{transform:none;width:2in;height:3.5in;box-shadow:none;break-inside:avoid}
 }

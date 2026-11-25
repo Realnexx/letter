@@ -45,7 +45,7 @@ Import this repository, use the Vite preset, build command `npm run build`, outp
 
 ## Printed QR gift card
 
-Open `/gift-card.html` for Kimberly Ann's matching 2 × 3.5 inch gift-card studio. After publishing the website, paste its public HTTPS URL, create the QR code, then print/save PDF or download the card PNG and QR SVG. On a public HTTPS deployment the studio initializes with that site's home URL. Localhost, local-network addresses, and GitHub source-code links are rejected. The QR uses high error correction, a four-module white quiet zone, burgundy modules and no overlaid logo. The PNG is 600 × 1050 pixels with embedded 300 DPI print metadata (2 × 3.5 inches). A scannable final code cannot be created until the public website link exists. Always scan a printed proof before gifting.
+Open `/gift-card.html` for Kimberly Ann's matching 2 × 3.5 inch gift-card studio. After publishing the website, paste its public HTTPS URL, create the QR code, then print/save PDF or download the card PNG and QR SVG. Printing places one 2 × 3.5 inch card at the top-left of a white A4 sheet with a 10 mm printer-safe margin; use 100% / Actual size. On a public HTTPS deployment the studio initializes with that site's home URL. Localhost, local-network addresses, and GitHub source-code links are rejected. The QR uses high error correction, a four-module white quiet zone, burgundy modules and no overlaid logo. The PNG is 600 × 1050 pixels with embedded 300 DPI print metadata (2 × 3.5 inches). A scannable final code cannot be created until the public website link exists. Always scan a printed proof before gifting.
 
 ## Supplied narration and word highlighting
 

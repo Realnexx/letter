@@ -36,7 +36,7 @@ test('gift card rejects local links and generates a decodable downloadable QR', 
   await expect(page.getByRole('button',{name:'Print / save PDF',exact:true})).toBeDisabled();
 });
 
-test('gift card preview fits mobile and prints at 2 by 3.5 inches', async ({page}) => {
+test('gift card prints at the top-left of A4 while retaining 2 by 3.5 inches', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/gift-card.html');
   await page.evaluate(()=>document.fonts.ready);
@@ -44,9 +44,10 @@ test('gift card preview fits mobile and prints at 2 by 3.5 inches', async ({page
   expect(await page.locator('.card-frame').evaluate(el=>el.scrollHeight<=el.clientHeight)).toBe(true);
   await page.screenshot({path:'test-results/gift-card-mobile.png',fullPage:true});
   await page.emulateMedia({media:'print'});
+  expect(await page.locator('html').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(255, 255, 255)');
   expect(await page.locator('.card-frame').evaluate(el=>el.scrollHeight<=el.clientHeight)).toBe(true);
-  const dimensions=await page.locator('#gift-card').boundingBox();expect(dimensions!.width).toBe(192);expect(dimensions!.height).toBe(336);
+  const dimensions=await page.locator('#gift-card').boundingBox();expect(dimensions!.width).toBe(192);expect(dimensions!.height).toBe(336);expect(dimensions!.x).toBe(0);expect(dimensions!.y).toBe(0);
   const pdf=await page.pdf({preferCSSPageSize:true,printBackground:true});
   const media=pdf.toString('latin1').match(/\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]/);
-  expect(media).not.toBeNull();expect(Number(media![1])).toBeCloseTo(144,0);expect(Number(media![2])).toBeCloseTo(252,0);
+  expect(media).not.toBeNull();expect(Number(media![1])).toBeGreaterThan(594);expect(Number(media![1])).toBeLessThan(597);expect(Number(media![2])).toBeGreaterThan(841);expect(Number(media![2])).toBeLessThan(843);
 });
